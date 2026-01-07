@@ -22,11 +22,11 @@
               <li v-if="user.admin" data-cy="admin-settings-link"><NuxtLink to="/admin/settings/backend">
                 Admin Settings
               </NuxtLink></li>
-              <li data-cy="change-password-link"><NuxtLink :to="{ name: 'user-username', params: { username: user.username } }">
-                Change password
+              <li data-cy="profile-link"><NuxtLink to="/profile">
+                Profile
               </NuxtLink></li>
               <li><a data-cy="help" href="https://torrust.github.io/torrust-index-gui-user-guide/" target="_blank">Help</a></li>
-              <li><a data-cy="logout-link" @click="logoutUser()">Logout {{ user.username }}</a></li>
+              <li><a data-cy="logout-link" @click="logoutAndRedirect()">Logout {{ user.username }}</a></li>
             </ul>
           </div>
         </template>
@@ -74,7 +74,7 @@
 import { UserCircleIcon, Bars3Icon, MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 import { type Ref } from "vue";
 import { type PublicSettings } from "torrust-index-types-lib";
-import { ref, useSettings, useUser, logoutUser } from "#imports";
+import { ref, useSettings, useUser, logoutUser, useRuntimeConfig } from "#imports";
 
 const settings: PublicSettings = useSettings().value;
 const user = useUser();
@@ -84,6 +84,14 @@ const mobileCollapsed = ref(true);
 // Define the submitSearch function
 function submitSearch () {
   // Add your search logic here
+}
+
+function logoutAndRedirect () {
+  logoutUser();
+  const apiBase = (useRuntimeConfig().public.apiBase || "").replace(/\/+$/, "");
+  if (process.client) {
+    window.location.href = `${apiBase}/user/oidc/login`;
+  }
 }
 </script>
 

@@ -1,4 +1,3 @@
-import { createCanvas, registerFont, CanvasRenderingContext2D } from "canvas";
 import DOMPurify from "dompurify";
 import { useRestApi } from "#imports";
 
