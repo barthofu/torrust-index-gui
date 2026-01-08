@@ -3,6 +3,15 @@
     <h2 class="text-2xl font-semibold text-neutral-content">
       Upload Torrent
     </h2>
+    <template v-if="user?.username">
+      <div class="w-full max-w-xl my-3">
+        <div class="p-3 border-2 border-base-content/20 rounded-2xl bg-base-100 flex items-center gap-2">
+          <span class="font-medium">Announce URL:</span>
+          <code class="break-all text-sm" data-cy="announce-url">{{ announceUrl || "Loading…" }}</code>
+          <button class="btn btn-xs ml-auto" :disabled="!announceUrl" @click="copyAnnounceUrl">Copy</button>
+        </div>
+      </div>
+    </template>
     <div class="flex flex-col w-full max-w-xl gap-6">
       <div>
         <label for="title" class="px-2">Title</label>
@@ -111,6 +120,7 @@ import {
   onMounted,
   ref, toRaw,
   useRestApi,
+  useRuntimeConfig,
   useTags,
   useUser
 } from "#imports";
@@ -134,6 +144,7 @@ const categories = useCategories();
 const tags = useTags();
 const user = useUser();
 const rest = useRestApi();
+const announceUrl: Ref<string | null> = ref(null);
 
 const agreeToTerms: Ref<boolean> = ref(false);
 const uploading: Ref<boolean> = ref(false);
@@ -150,6 +161,7 @@ const contentUploadAgreement = ref("");
 onMounted(() => {
   getCategories();
   getTags();
+  loadAnnounceUrl();
 });
 
 watch(
@@ -160,6 +172,15 @@ watch(
     }
   },
   { immediate: true }
+);
+
+watch(
+  () => user.value,
+  (val) => {
+    if (val && !announceUrl.value) {
+      loadAnnounceUrl();
+    }
+  }
 );
 
 function formValid () {
@@ -174,6 +195,38 @@ function setTags (e: any) {
 
 function setFile (file: any) {
   [form.value.torrentFile] = file;
+}
+
+async function loadAnnounceUrl () {
+  try {
+    const token = rest.value.authToken;
+    if (!token) return;
+    const apiBase = (useRuntimeConfig().public.apiBase || "").replace(/\/+$/, "");
+    const res = await fetch(`${apiBase}/user/tracker/announce`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new Error(body?.error || "Failed to fetch announce URL");
+    }
+    announceUrl.value = body?.data?.announce_url || null;
+  } catch (err: any) {
+    notify({
+      group: "error",
+      title: "Error",
+      text: `Trying to get announce URL. ${err.message}.`
+    }, 8000);
+  }
+}
+
+async function copyAnnounceUrl () {
+  if (!announceUrl.value) return;
+  try {
+    await navigator.clipboard.writeText(announceUrl.value);
+    notify({ group: "success", title: "Copied", text: "Announce URL copied to clipboard." }, 3000);
+  } catch {
+    notify({ group: "error", title: "Error", text: "Failed to copy announce URL." }, 3000);
+  }
 }
 
 function submitForm () {
