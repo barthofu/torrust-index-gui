@@ -8,7 +8,9 @@
         <div class="p-3 border-2 border-base-content/20 rounded-2xl bg-base-100 flex items-center gap-2">
           <span class="font-medium">Announce URL:</span>
           <code class="break-all text-sm" data-cy="announce-url">{{ announceUrl || "Loading…" }}</code>
-          <button class="btn btn-xs ml-auto" :disabled="!announceUrl" @click="copyAnnounceUrl">Copy</button>
+          <button class="btn btn-xs ml-auto" :disabled="!announceUrl" @click="copyAnnounceUrl">
+            Copy
+          </button>
         </div>
       </div>
     </template>
@@ -200,7 +202,9 @@ function setFile (file: any) {
 async function loadAnnounceUrl () {
   try {
     const token = rest.value.authToken;
-    if (!token) return;
+    if (!token) {
+      return;
+    }
     const apiBase = (useRuntimeConfig().public.apiBase || "").replace(/\/+$/, "");
     const res = await fetch(`${apiBase}/user/tracker/announce`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -220,7 +224,9 @@ async function loadAnnounceUrl () {
 }
 
 async function copyAnnounceUrl () {
-  if (!announceUrl.value) return;
+  if (!announceUrl.value) {
+    return;
+  }
   try {
     await navigator.clipboard.writeText(announceUrl.value);
     notify({ group: "success", title: "Copied", text: "Announce URL copied to clipboard." }, 3000);

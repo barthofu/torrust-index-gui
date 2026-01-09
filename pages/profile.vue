@@ -18,7 +18,7 @@
           <span class="font-semibold">Tracker Announce URL:</span>
           <span class="ml-2 break-all">{{ announceUrl || "Fetching…" }}</span>
         </div>
-        <div class="mt-2" v-if="trackerKey">
+        <div v-if="trackerKey" class="mt-2">
           <span class="font-semibold">Tracker Key:</span>
           <span class="ml-2 break-all">{{ trackerKey }}</span>
         </div>
@@ -38,7 +38,6 @@ import { getUser } from "../composables/states";
 import { useUser, useRuntimeConfig, useRestApi } from "#imports";
 
 const user = useUser();
-console.log("User in profile page:", user.value?.username);
 const username = computed(() => user.value?.username ?? user.value?.user ?? "");
 const email = computed(() => user.value?.user?.email ?? "");
 const announceUrl = ref<string>("");
