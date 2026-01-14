@@ -17,12 +17,25 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { notify } from "notiwind-ts";
+import { useRestApi } from "#imports";
 
 const error = ref<string | null>(null);
 
 onMounted(async () => {
   try {
     const url = new URL(window.location.href);
+    const err = url.searchParams.get("error");
+    const errDesc = url.searchParams.get("error_description");
+    if (err) {
+      const isAccessDenied = err === "access_denied";
+      error.value = isAccessDenied
+        ? "Votre compte n'est pas autorisé à accéder à cette application."
+        : `OIDC error: ${err}${errDesc ? ": " + errDesc : ""}`;
+      // Optionally redirect to sign-in after a short delay
+      setTimeout(() => navigateTo("/signin", { replace: true }), 3000);
+      return;
+    }
+
     const token = url.searchParams.get("token");
     if (!token) {
       error.value = "Missing token in callback.";
