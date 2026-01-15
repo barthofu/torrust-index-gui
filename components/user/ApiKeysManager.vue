@@ -171,7 +171,7 @@ async function fetchKeys () {
 
   loading.value = true;
   try {
-    const res = await $fetch<OkResponseData<ApiKeyPublic[]>>(`${apiBase()}/v1/user/api-keys`, {
+    const res = await $fetch<OkResponseData<ApiKeyPublic[]>>(`${apiBase()}/user/api-keys`, {
       headers: authHeaders()
     });
     apiKeys.value = res.data;
@@ -193,7 +193,7 @@ async function createKey () {
 
   busy.value = true;
   try {
-    const res = await $fetch<OkResponseData<CreatedApiKey>>(`${apiBase()}/v1/user/api-keys`, {
+    const res = await $fetch<OkResponseData<CreatedApiKey>>(`${apiBase()}/user/api-keys`, {
       method: "POST",
       headers: {
         ...authHeaders(),
