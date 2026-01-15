@@ -237,7 +237,7 @@ async function revokeKey (apiKeyId: number) {
 
   busy.value = true;
   try {
-    await $fetch<OkResponseData<number>>(`${apiBase()}/v1/user/api-keys/${apiKeyId}`, {
+    await $fetch<OkResponseData<number>>(`${apiBase()}/user/api-keys/${apiKeyId}`, {
       method: "DELETE",
       headers: authHeaders()
     });
